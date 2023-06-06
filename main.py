@@ -20,7 +20,7 @@ def main(first_file, second_file):
             data.append(list(map(int, list(bits))))
             label_data.append(int(label))
     input_size = 16
-    hidden_sizes = [64, 32]
+    hidden_sizes = [128, 64, 32]
     # for i in range(POPULATION_SIZE):
     #     hidden_size_i = []
     #     # randaomly generate hidden layer sizes for random size of layers
@@ -63,6 +63,7 @@ def mutate(child, mutation_range):
         child.biases[i][mask] += np.random.uniform(-mutation_range, mutation_range, size=child.biases[i].shape)[mask]
         return child
 
+
 def genetic_algorithm(train, train_label, input_size, hidden_sizes, output_size):
     population = []
     for i in range(POPULATION_SIZE):
@@ -70,7 +71,12 @@ def genetic_algorithm(train, train_label, input_size, hidden_sizes, output_size)
         len(population[0].weights)
     offspring = []
     for generation in range(NUM_GENERATIONS):
-        fitness_scores = [nn.evaluate_fitness(train, train_label) for nn in population]
+        #  random select batch from training data
+        batch_size = 100
+        batch_index = random.sample(range(len(train)), batch_size)
+        batch = [train[i] for i in batch_index]
+        batch_label = [train_label[i] for i in batch_index]
+        fitness_scores = [nn.evaluate_fitness(batch, batch_label) for nn in population]
         num_replication = int(REPLICATION * POPULATION_SIZE)
         fitness_scores_copy = fitness_scores.copy()
         for i in range(num_replication):

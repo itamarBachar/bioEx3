@@ -20,7 +20,7 @@ def main(first_file, second_file):
             data.append(list(map(int, list(bits))))
             label_data.append(int(label))
     input_size = 16
-    hidden_sizes = [128, 64, 32]
+    hidden_sizes = [64, 32]
     # for i in range(POPULATION_SIZE):
     #     hidden_size_i = []
     #     # randaomly generate hidden layer sizes for random size of layers
@@ -69,14 +69,10 @@ def genetic_algorithm(train, train_label, input_size, hidden_sizes, output_size)
     for i in range(POPULATION_SIZE):
         population.append(Nn(input_size, hidden_sizes, output_size, None, None))
         len(population[0].weights)
-    offspring = []
     for generation in range(NUM_GENERATIONS):
+        offspring = []
         #  random select batch from training data
-        batch_size = 100
-        batch_index = random.sample(range(len(train)), batch_size)
-        batch = [train[i] for i in batch_index]
-        batch_label = [train_label[i] for i in batch_index]
-        fitness_scores = [nn.evaluate_fitness(batch, batch_label) for nn in population]
+        fitness_scores = [nn.evaluate_fitness(train, train_label) for nn in population]
         num_replication = int(REPLICATION * POPULATION_SIZE)
         fitness_scores_copy = fitness_scores.copy()
         for i in range(num_replication):
@@ -84,18 +80,15 @@ def genetic_algorithm(train, train_label, input_size, hidden_sizes, output_size)
             offspring.append(population[index])
             fitness_scores_copy[index] = -1
         for i in range(POPULATION_SIZE - num_replication):
-            tournament_size = 5
+            tournament_size = 3
             tournament = random.sample(population, tournament_size)
             # Choose the individual with the highest fitness score as the winner
             winner = max(tournament, key=lambda x: x.score)
             tournament = random.sample(population, tournament_size)
             # Choose the individual with the highest fitness score as the winner
             winner2 = max(tournament, key=lambda x: x.score)
-            while winner == winner2:
-                tournament = random.sample(population, tournament_size)
-                winner2 = max(tournament, key=lambda x: x.score)
             child = crossover(winner, winner2)
-            child = mutate(child, 0.05)
+            child = mutate(child, 0.1)
             offspring.append(child)
         population = offspring
         print("Generation: ", generation, "Best fitness: ", max(fitness_scores))

@@ -46,6 +46,11 @@ class Nn:
         score = 0
         for i in range(len(x)):
             output = self.forward(x[i])
-
+            if output >= 0.5:
+                output = 1
+            else:
+                output = 0
+            if output == y[i]:
+                score += 1
         self.score = score
         return score

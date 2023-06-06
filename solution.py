@@ -26,8 +26,8 @@ class Nn:
             self.weights = weights
             self.biases = biases
 
-    def __copy__(self):
-        return Nn(self.input_size, self.hidden_sizes, self.output_size)
+    def copy(self):
+        return Nn(self.input_size, self.hidden_sizes, self.output_size, self.weights, self.biases)
 
     def forward(self, x):
         input_data = x
@@ -54,3 +54,18 @@ class Nn:
                 score += 1
         self.score = score
         return score
+    def test_accuracy(self,test, test_label):
+        #calculate accuracy based on test data
+        score = 0
+        for i in range(len(test)):
+            output = self.forward(test[i])
+            if output >= 0.5:
+                output = 1
+            else:
+                output = 0
+            if output == test_label[i]:
+                score += 1
+        accuracy= score/len(test)
+        return accuracy
+
+

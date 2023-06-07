@@ -4,6 +4,8 @@ import numpy as np
 
 from solution import Nn
 
+output_size = 1
+input_size = 16
 MUTATION_RATE = 0.2
 POPULATION_SIZE = 50
 NUM_GENERATIONS = 100
@@ -44,9 +46,7 @@ def buildnet0(train_file, test_file):
             bits, label = line.strip().split()  # Splitting by whitespace
             test.append(list(map(int, list(bits))))
             test_label.append(int(label))
-    input_size = 16
     hidden_sizes = []
-    output_size = 1
     for i in range(POPULATION_SIZE):
         hidden_size_i = []
         # randaomly generate hidden layer sizes for random size of layers
@@ -59,8 +59,56 @@ def buildnet0(train_file, test_file):
         hidden_sizes.append(hidden_size_i)
     solution = genetic_algorithm(train, train_label, test, test_label, input_size, hidden_sizes, output_size)
     # open file to write the solution
-    with open('wnet0.txt', 'w') as f:
-        f.write(str(solution))
+    with open("wnet0.txt", 'w') as file:
+        for i, matrix in enumerate(solution.weights):
+            file.write(f"Matrix {i + 1}:\n")
+            for row in matrix:
+                file.write(" ".join(str(element) for element in row) + "\n")
+            file.write("\n")  # Add a blank line between matrices
+        for i, matrix in enumerate(solution.biases):
+            file.write(f"biases {i + 1}:\n")
+            file.write(" ".join(str(element) for element in matrix) + "\n")
+            file.write("\n")
+    runnet0("wnet0.txt", test_file)
+
+def runnet0(weight_file, test_file):
+    weight, bias = read_matrices_and_biases_from_file(weight_file)
+    hidden_sizes = []
+    for i in range(len(weight) - 1):
+        hidden_sizes.append((weight[i].shape[1]))
+    best_solution = Nn(input_size, output_size, hidden_sizes, weight, bias)
+
+
+def read_matrices_and_biases_from_file(file_path):
+    with open("wnet0.txt", 'r') as file:
+        lines = file.readlines()
+
+    matrices = {}
+    biases = {}
+    current_data = []
+    current_name = None
+    current_dictionary = None
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("Matrix"):
+            if current_name and current_dictionary is not None:
+                current_dictionary[current_name] = current_data
+            current_name = line
+            current_data = []
+            current_dictionary = matrices
+        elif line.startswith("biases"):
+            if current_name and current_dictionary is not None:
+                current_dictionary[current_name] = current_data
+            current_name = line
+            current_data = []
+            current_dictionary = biases
+        elif line:
+            current_data.append(list(map(float, line.split())))
+
+    if current_name and current_dictionary is not None:
+        current_dictionary[current_name] = current_data
+    return matrices, biases
 
 # def main(first_file, second_file):
 #     # split_file(second_file)

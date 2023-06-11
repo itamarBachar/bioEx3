@@ -8,44 +8,32 @@ output_size = 1
 input_size = 16
 MUTATION_RATE = 0.2
 POPULATION_SIZE = 50
-NUM_GENERATIONS = 100
+NUM_GENERATIONS = 150
 REPLICATION = 0.1
 
 
 # split the nn0.txt to 2 files one is 80 percent and the other is 20 percent
 def split_file(file_name):
     with open(file_name, 'r') as f:
-        data = f.readlines()
-    with open('nn0_train.txt', 'w') as f:
-        f.writelines(data[:int(len(data) * 0.8)])
-    with open('nn0_test.txt', 'w') as f:
-        f.writelines(data[int(len(data) * 0.8):])
+        lines = f.readlines()
+    train = lines[:int(len(lines) * 0.8)]
+    test = lines[int(len(lines) * 0.8):]
+    return train, test
 
 
-def split_file2(file_name):
-    with open(file_name, 'r') as f:
-        data = f.readlines()
-    with open('nn1_train.txt', 'w') as f:
-        f.writelines(data[:int(len(data) * 0.8)])
-    with open('nn1_test.txt', 'w') as f:
-        f.writelines(data[int(len(data) * 0.8):])
-
-
-def buildnet0(train_file, test_file):
+def buildnet0(train_data, test_data):
     train = []
     train_label = []
-    with open(train_file, 'r') as f:
-        for line in f:
-            bits, label = line.strip().split()  # Splitting by whitespace
-            train.append(list(map(int, list(bits))))
-            train_label.append(int(label))
+    for line in train_data:
+        bits, label = line.strip().split()
+        train.append(list(map(int, list(bits))))
+        train_label.append(int(label))
     test = []
     test_label = []
-    with open(test_file, 'r') as f:
-        for line in f:
-            bits, label = line.strip().split()  # Splitting by whitespace
-            test.append(list(map(int, list(bits))))
-            test_label.append(int(label))
+    for line in test_data:
+        bits, label = line.strip().split()
+        test.append(list(map(int, list(bits))))
+        test_label.append(int(label))
     hidden_sizes = []
     for i in range(POPULATION_SIZE):
         hidden_size_i = []
@@ -69,90 +57,8 @@ def buildnet0(train_file, test_file):
             file.write(f"biases {i + 1}:\n")
             file.write(" ".join(str(element) for element in matrix) + "\n")
             file.write("\n")
-    runnet0("wnet0.txt", test_file)
-
-def runnet0(weight_file, test_file):
-    weight, bias = read_matrices_and_biases_from_file(weight_file)
-    hidden_sizes = []
-    for i in range(len(weight) - 1):
-        hidden_sizes.append((weight[i].shape[1]))
-    best_solution = Nn(input_size, output_size, hidden_sizes, weight, bias)
 
 
-def read_matrices_and_biases_from_file(file_path):
-    with open("wnet0.txt", 'r') as file:
-        lines = file.readlines()
-
-    matrices = {}
-    biases = {}
-    current_data = []
-    current_name = None
-    current_dictionary = None
-
-    for line in lines:
-        line = line.strip()
-        if line.startswith("Matrix"):
-            if current_name and current_dictionary is not None:
-                current_dictionary[current_name] = current_data
-            current_name = line
-            current_data = []
-            current_dictionary = matrices
-        elif line.startswith("biases"):
-            if current_name and current_dictionary is not None:
-                current_dictionary[current_name] = current_data
-            current_name = line
-            current_data = []
-            current_dictionary = biases
-        elif line:
-            current_data.append(list(map(float, line.split())))
-
-    if current_name and current_dictionary is not None:
-        current_dictionary[current_name] = current_data
-    return matrices, biases
-
-# def main(first_file, second_file):
-#     # split_file(second_file)
-#     # Read the first file
-#     data = []
-#     label_data = []
-#     with open(first_file, 'r') as f:
-#         for line in f:
-#             bits, label = line.strip().split()  # Splitting by whitespace
-#             data.append(list(map(int, list(bits))))
-#             label_data.append(int(label))
-#     input_size = 16
-#     hidden_sizes = []
-#     for i in range(POPULATION_SIZE):
-#         hidden_size_i = []
-#         # randaomly generate hidden layer sizes for random size of layers
-#         amount = random.randint(2, 5)
-#         size = random.randint(32, 64)
-#         hidden_size_i.append(size)
-#         for j in range(amount - 1):
-#             size = random.randint(int(size / 2), size)
-#             hidden_size_i.append(size)
-#         hidden_sizes.append(hidden_size_i)
-#     output_size = 1
-#     train, test = data[:int(len(data) * 0.8)], data[int(len(data) * 0.8):]
-#     train_label, test_label = label_data[:int(len(label_data) * 0.8)], label_data[int(len(label_data) * 0.8):]
-#
-#     genetic_algorithm(train, train_label, test, test_label, input_size, hidden_sizes, output_size)
-
-
-# def crossover(winner, winner2):
-#     child_weights = []
-#     child_biases = []
-#     for i in range(len(winner.weights)):
-#         weight1 = winner.weights[i]
-#         weight2 = winner2.weights[i]
-#         child_weight = np.where(np.random.rand(*weight1.shape) < 0.5, weight1, weight2)
-#         child_weights.append(child_weight)
-#         bias1 = winner.biases[i]
-#         bias2 = winner2.biases[i]
-#         child_bias = np.where(np.random.rand(*bias1.shape) < 0.5, bias1, bias2)
-#         child_biases.append(child_bias)
-#
-#     return Nn(winner.input_size, winner.hidden_sizes, winner.output_size, child_weights, child_biases)
 def crossover(winner, winner2):
     child_weights = []
     child_biases = []
@@ -235,14 +141,8 @@ def genetic_algorithm(train, train_label, test, test_label, input_size, hidden_s
     return best_solution
 
 
-def buildnet1(param, param1):
-    pass
-
-
 if __name__ == '__main__':
-    # get the arguments passed to python main.py
+    # get the arguments passed to python buildnet0.py
     args = sys.argv
-    split_file(args[1])
-    split_file2(args[2])
-    buildnet0("nn0_train.txt", "nn0_test.txt")
-    buildnet1("nn1_train.txt", "nn1_test.txt")
+    train, test = split_file(args[1])
+    buildnet0(train, test)

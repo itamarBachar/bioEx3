@@ -54,8 +54,9 @@ class Nn:
                 score += 1
         self.score = score
         return score
-    def test_accuracy(self,test, test_label):
-        #calculate accuracy based on test data
+
+    def test_accuracy(self, test, test_label):
+        # calculate accuracy based on test data
         score = 0
         for i in range(len(test)):
             output = self.forward(test[i])
@@ -65,7 +66,5 @@ class Nn:
                 output = 0
             if output == test_label[i]:
                 score += 1
-        accuracy= score/len(test)
+        accuracy = score / len(test)
         return accuracy
-
-

@@ -8,7 +8,7 @@ output_size = 1
 input_size = 16
 MUTATION_RATE = 0.2
 POPULATION_SIZE = 50
-NUM_GENERATIONS = 150
+NUM_GENERATIONS = 250
 REPLICATION = 0.1
 
 
@@ -47,7 +47,7 @@ def buildnet0(train_data, test_data):
         hidden_sizes.append(hidden_size_i)
     solution = genetic_algorithm(train, train_label, test, test_label, input_size, hidden_sizes, output_size)
     # open file to write the solution
-    with open("wnet0.txt", 'w') as file:
+    with open("wnet0.", 'w') as file:
         for i, matrix in enumerate(solution.weights):
             file.write(f"Matrix {i + 1}:\n")
             for row in matrix:
@@ -92,7 +92,6 @@ def crossover(winner, winner2):
         else:
             child_bias = np.where(np.random.rand(*bias1.shape) < 0.5, bias1, bias2)
             child_biases.append(child_bias)
-
     return Nn(winner.input_size, winner.hidden_sizes, winner.output_size, child_weights, child_biases)
 
 

@@ -10,7 +10,7 @@ NUM_GENERATIONS = 150
 REPLICATION = 0.1
 
 
-def runnet0(weight_file, test_file):
+def runnet1(weight_file, test_file):
     weight, bias = read_matrices_and_biases_from_file(weight_file)
     hidden_sizes = []
     for i in range(len(weight) - 1):
@@ -24,9 +24,9 @@ def runnet0(weight_file, test_file):
             y = list(map(int, list(x)))
             output = best_solution.forward(y)
             if output > 0.5:
-                f.write(x + " 1\n")
+                f.write(x + "   1\n")
             else:
-                f.write(x + " 0\n")
+                f.write(x + "   0\n")
 
 
 def read_matrices_and_biases_from_file(file_path):
@@ -67,4 +67,4 @@ def read_matrices_and_biases_from_file(file_path):
 
 
 if __name__ == '__main__':
-    runnet0(sys.argv[1], sys.argv[2])
+    runnet1(sys.argv[1], sys.argv[2])

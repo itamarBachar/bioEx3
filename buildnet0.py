@@ -47,7 +47,7 @@ def buildnet0(train_data, test_data):
         hidden_sizes.append(hidden_size_i)
     solution = genetic_algorithm(train, train_label, test, test_label, input_size, hidden_sizes, output_size)
     # open file to write the solution
-    with open("wnet0.txt", 'w') as file:
+    with open("wnet0.", 'w') as file:
         for i, matrix in enumerate(solution.weights):
             file.write(f"Matrix {i + 1}:\n")
             for row in matrix:

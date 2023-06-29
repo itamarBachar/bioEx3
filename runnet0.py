@@ -24,9 +24,9 @@ def runnet0(weight_file, test_file):
             y = list(map(int, list(x)))
             output = best_solution.forward(y)
             if output > 0.5:
-                f.write(x + "   1\n")
+                f.write("1\n")
             else:
-                f.write(x + "   0\n")
+                f.write("0\n")
 
 
 def read_matrices_and_biases_from_file(file_path):

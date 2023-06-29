@@ -5,10 +5,11 @@ import numpy as np
 from solution import Nn
 
 output_size = 1
+
 input_size = 16
 MUTATION_RATE = 0.2
-POPULATION_SIZE = 50
-NUM_GENERATIONS = 250
+POPULATION_SIZE = 100
+NUM_GENERATIONS = 200
 REPLICATION = 0.1
 
 
@@ -16,9 +17,9 @@ REPLICATION = 0.1
 def split_file(file_name):
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    train = lines[:int(len(lines) * 0.8)]
-    test = lines[int(len(lines) * 0.8):]
-    return train, test
+    train = lines[:int(len(lines) * 1)]
+    # test = lines[int(len(lines) * 0.8):]
+    return train
 
 
 def buildnet0(train_data, test_data):
@@ -38,8 +39,8 @@ def buildnet0(train_data, test_data):
     for i in range(POPULATION_SIZE):
         hidden_size_i = []
         # randaomly generate hidden layer sizes for random size of layers
-        amount = random.randint(2, 5)
-        size = random.randint(32, 64)
+        amount = random.randint(1, 5)
+        size = random.randint(25, 50)
         hidden_size_i.append(size)
         for j in range(amount - 1):
             size = random.randint(int(size / 2), size)
@@ -47,7 +48,7 @@ def buildnet0(train_data, test_data):
         hidden_sizes.append(hidden_size_i)
     solution = genetic_algorithm(train, train_label, test, test_label, input_size, hidden_sizes, output_size)
     # open file to write the solution
-    with open("wnet0.", 'w') as file:
+    with open("wnet0.txt", 'w') as file:
         for i, matrix in enumerate(solution.weights):
             file.write(f"Matrix {i + 1}:\n")
             for row in matrix:
@@ -136,12 +137,13 @@ def genetic_algorithm(train, train_label, test, test_label, input_size, hidden_s
             offspring.append(child)
         population = offspring
         print("Generation: ", generation, "Best fitness: ", max(fitness_scores))
-    print(best_solution.test_accuracy(test, test_label))
+    print("Test Accuracy" , best_solution.test_accuracy(test, test_label))
     return best_solution
 
 
 if __name__ == '__main__':
     # get the arguments passed to python buildnet0.py
     args = sys.argv
-    train, test = split_file(args[1])
+    train = split_file(args[1])
+    test = split_file(args[2])
     buildnet0(train, test)
